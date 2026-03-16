@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Find a Donor — BloodLink</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,400&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    /* ── PAGE-SPECIFIC STYLES ── */
+    .page-hero {
+      background: linear-gradient(135deg, #fff5f5 0%, var(--soft-red) 100%);
+      padding: 120px 5% 60px;
+      text-align: center;
+      border-bottom: 1px solid var(--border);
+    }
+    .page-hero .section-label { margin-bottom: 10px; }
+    .page-hero h1 {
+      font-family: var(--font-head); font-size: clamp(2rem, 4vw, 3rem);
+      font-weight: 800; color: var(--text); letter-spacing: -.4px;
+      margin-bottom: 12px;
+    }
+    .page-hero h1 span { color: var(--primary); }
+    .page-hero p {
+      font-size: 1rem; color: var(--text-muted); max-width: 520px;
+      margin: 0 auto;
+    }
+
+    /* ── SEARCH BAR ── */
+    .search-section {
+      background: var(--white);
+      padding: 40px 5%;
+      border-bottom: 1px solid var(--border);
+      position: sticky; top: 68px; z-index: 50;
+      box-shadow: var(--shadow-sm);
+    }
+    .search-bar {
+      display: flex; gap: 12px; flex-wrap: wrap;
+      max-width: 900px; margin: 0 auto;
+    }
+    .search-input-wrap {
+      flex: 1; min-width: 200px;
+      display: flex; align-items: center; gap: 10px;
+      background: var(--bg); border: 1.5px solid var(--border);
+      border-radius: 50px; padding: 12px 20px;
+      transition: border-color .2s;
+    }
+    .search-input-wrap:focus-within { border-color: var(--primary); }
+    .search-input-wrap svg { width: 18px; height: 18px; flex-shrink: 0; color: var(--text-muted); }
+    .search-input-wrap input {
+      border: none; background: transparent; font-family: var(--font-body);
+      font-size: .9rem; color: var(--text); outline: none; width: 100%;
+    }
+    .search-input-wrap input::placeholder { color: var(--text-muted); }
+
+    .filter-select {
+      background: var(--bg); border: 1.5px solid var(--border);
+      border-radius: 50px; padding: 12px 20px;
+      font-family: var(--font-body); font-size: .9rem; color: var(--text);
+      outline: none; cursor: pointer; min-width: 150px;
+      transition: border-color .2s; appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%236B7280' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+      background-repeat: no-repeat; background-position: right 14px center;
+      padding-right: 36px;
+    }
+    .filter-select:focus { border-color: var(--primary); }
+
+    .search-btn {
+      background: var(--primary); color: #fff;
+      border: none; border-radius: 50px; padding: 12px 28px;
+      font-family: var(--font-body); font-weight: 600; font-size: .9rem;
+      cursor: pointer; display: flex; align-items: center; gap: 8px;
+      transition: all .2s;
+    }
+    .search-btn:hover { background: var(--primary-dark); transform: translateY(-1px); }
+    .search-btn svg { width: 16px; height: 16px; }
+
+    /* ── RESULTS ── */
+    .results-section { padding: 48px 5%; background: var(--bg); min-height: 60vh; }
+    .results-header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 28px; flex-wrap: wrap; gap: 12px;
+    }
+    .results-count {
+      font-family: var(--font-head); font-size: 1rem; font-weight: 700; color: var(--text);
+    }
+    .results-count span { color: var(--primary); }
+    .sort-wrap { display: flex; align-items: center; gap: 8px; font-size: .85rem; color: var(--text-muted); }
+
+    /* Donor Grid */
+    .donor-grid {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px;
+    }
+    .donor-card {
+      background: var(--white); border-radius: var(--radius);
+      border: 1px solid var(--border); padding: 24px;
+      transition: all .25s; cursor: pointer;
+    }
+    .donor-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-md); border-color: rgba(220,53,69,.25); }
+    .donor-card-top {
+      display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 16px;
+    }
+    .donor-card-avatar {
+      width: 52px; height: 52px; border-radius: 50%; background: var(--primary);
+      display: flex; align-items: center; justify-content: center;
+      font-family: var(--font-head); font-size: 1rem; font-weight: 700; color: #fff;
+      flex-shrink: 0;
+    }
+    .donor-card-avatar.alt1 { background: #6366f1; }
+    .donor-card-avatar.alt2 { background: #0ea5e9; }
+    .donor-card-avatar.alt3 { background: #f59e0b; }
+    .donor-card-avatar.alt4 { background: var(--success); }
+    .blood-badge {
+      background: var(--soft-red); color: var(--primary);
+      font-family: var(--font-head); font-size: .85rem; font-weight: 800;
+      padding: 6px 12px; border-radius: 8px;
+      border: 1.5px solid rgba(220,53,69,.2);
+    }
+    .donor-card h3 {
+      font-family: var(--font-head); font-size: 1rem; font-weight: 700;
+      color: var(--text); margin-bottom: 4px;
+    }
+    .donor-card-meta {
+      display: flex; flex-direction: column; gap: 6px; margin-bottom: 16px;
+    }
+    .donor-meta-row {
+      display: flex; align-items: center; gap: 6px;
+      font-size: .82rem; color: var(--text-muted);
+    }
+    .donor-meta-row svg { width: 14px; height: 14px; flex-shrink: 0; }
+    .status-badge {
+      display: inline-flex; align-items: center; gap: 5px;
+      font-size: .75rem; font-weight: 600; padding: 4px 10px; border-radius: 50px;
+    }
+    .status-available { background: #d1fae5; color: #065f46; }
+    .status-unavailable { background: #f3f4f6; color: #6b7280; }
+    .status-dot { width: 6px; height: 6px; border-radius: 50%; }
+    .status-available .status-dot { background: var(--success); }
+    .status-unavailable .status-dot { background: #9ca3af; }
+
+    .contact-btn {
+      width: 100%; background: var(--primary); color: #fff;
+      border: none; border-radius: 10px; padding: 12px;
+      font-family: var(--font-body); font-weight: 600; font-size: .88rem;
+      cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;
+      transition: all .2s;
+    }
+    .contact-btn:hover { background: var(--primary-dark); }
+    .contact-btn svg { width: 16px; height: 16px; }
+
+    /* No results */
+    .no-results {
+      text-align: center; padding: 80px 20px; display: none;
+    }
+    .no-results svg { width: 56px; height: 56px; color: var(--border); margin: 0 auto 16px; display: block; }
+    .no-results h3 { font-family: var(--font-head); font-size: 1.2rem; font-weight: 700; margin-bottom: 8px; }
+    .no-results p { font-size: .9rem; color: var(--text-muted); }
+
+    /* Modal */
+    .modal-overlay {
+      position: fixed; inset: 0; background: rgba(0,0,0,.5);
+      z-index: 200; display: flex; align-items: center; justify-content: center;
+      padding: 20px; opacity: 0; pointer-events: none; transition: opacity .2s;
+    }
+    .modal-overlay.open { opacity: 1; pointer-events: all; }
+    .modal {
+      background: var(--white); border-radius: 24px; padding: 36px;
+      max-width: 440px; width: 100%;
+      transform: translateY(20px); transition: transform .2s;
+    }
+    .modal-overlay.open .modal { transform: none; }
+    .modal-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; }
+    .modal-top h2 { font-family: var(--font-head); font-size: 1.2rem; font-weight: 800; }
+    .modal-close {
+      width: 32px; height: 32px; border-radius: 50%; background: var(--bg);
+      border: none; cursor: pointer; display: flex; align-items: center; justify-content: center;
+    }
+    .modal-close svg { width: 16px; height: 16px; }
+    .modal-avatar {
+      width: 72px; height: 72px; border-radius: 50%; background: var(--primary);
+      display: flex; align-items: center; justify-content: center;
+      font-family: var(--font-head); font-size: 1.4rem; font-weight: 800; color: #fff;
+      margin: 0 auto 12px;
+    }
+    .modal-name { font-family: var(--font-head); font-size: 1.2rem; font-weight: 800; text-align: center; margin-bottom: 4px; }
+    .modal-blood { text-align: center; margin-bottom: 20px; }
+    .modal-details { display: flex; flex-direction: column; gap: 12px; margin-bottom: 24px; }
+    .modal-detail-row {
+      display: flex; align-items: center; gap: 12px;
+      background: var(--bg); border-radius: 10px; padding: 12px 16px;
+    }
+    .modal-detail-row svg { width: 18px; height: 18px; flex-shrink: 0; color: var(--primary); }
+    .modal-detail-row span { font-size: .88rem; color: var(--text); }
+    .modal-detail-row strong { display: block; font-size: .75rem; color: var(--text-muted); margin-bottom: 1px; }
+    .modal-actions { display: flex; gap: 10px; }
+    .modal-call-btn {
+      flex: 1; background: var(--primary); color: #fff; border: none;
+      border-radius: 10px; padding: 14px; font-family: var(--font-body);
+      font-weight: 600; font-size: .9rem; cursor: pointer;
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      transition: background .2s;
+    }
+    .modal-call-btn:hover { background: var(--primary-dark); }
+    .modal-msg-btn {
+      flex: 1; background: var(--bg); color: var(--text); border: 1.5px solid var(--border);
+      border-radius: 10px; padding: 14px; font-family: var(--font-body);
+      font-weight: 600; font-size: .9rem; cursor: pointer;
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      transition: all .2s;
+    }
+    .modal-msg-btn:hover { border-color: var(--primary); color: var(--primary); }
+
+    @media (max-width: 600px) {
+      .search-bar { flex-direction: column; }
+      .filter-select, .search-btn { width: 100%; justify-content: center; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a href="index.html" class="nav-logo">
+    <div class="drop">
+      <svg viewBox="0 0 24 24"><path d="M12 2C12 2 5 10.5 5 15a7 7 0 0014 0C19 10.5 12 2 12 2z"/></svg>
+    </div>
+    BloodLink
+  </a>
+  <ul class="nav-links">
+    <li><a href="index.html#about">About</a></li>
+    <li><a href="index.html#how">How It Works</a></li>
+    <li><a href="index.html#features">Features</a></li>
+    <li><a href="index.html#impact">Impact</a></li>
+  </ul>
+  <div class="nav-cta">
+    <a href="find-donor.html" class="btn btn-outline">Find Donor</a>
+    <a href="become-donor.html" class="btn btn-primary">Become a Donor</a>
+  </div>
+</nav>
+
+<!-- PAGE HERO -->
+<div class="page-hero">
+  <div class="section-label">Donor Directory</div>
+  <h1>Find a <span>Blood Donor</span></h1>
+  <p>Search our registry of registered voluntary donors by blood group or location. Every donor here is ready to help save a life.</p>
+</div>
+
+<!-- SEARCH BAR -->
+<div class="search-section">
+  <div class="search-bar">
+    <div class="search-input-wrap">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+      </svg>
+      <input type="text" id="searchName" placeholder="Search by name or location..." />
+    </div>
+    <select class="filter-select" id="filterBlood">
+      <option value="">All Blood Groups</option>
+      <option value="A+">A+</option>
+      <option value="A-">A-</option>
+      <option value="B+">B+</option>
+      <option value="B-">B-</option>
+      <option value="O+">O+</option>
+      <option value="O-">O-</option>
+      <option value="AB+">AB+</option>
+      <option value="AB-">AB-</option>
+    </select>
+    <select class="filter-select" id="filterStatus">
+      <option value="">Any Availability</option>
+      <option value="available">Available</option>
+      <option value="unavailable">Unavailable</option>
+    </select>
+    <button class="search-btn" onclick="filterDonors()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+      </svg>
+      Search
+    </button>
+  </div>
+</div>
+
+<!-- RESULTS -->
+<div class="results-section">
+  <div class="results-header">
+    <div class="results-count">Showing <span id="resultCount">12</span> donors</div>
+    <div class="sort-wrap">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+      Sorted by availability
+    </div>
+  </div>
+
+  <div class="donor-grid" id="donorGrid"></div>
+  <div class="no-results" id="noResults">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+    </svg>
+    <h3>No donors found</h3>
+    <p>Try adjusting your search filters to find available donors.</p>
+  </div>
+</div>
+
+<!-- CONTACT MODAL -->
+<div class="modal-overlay" id="modalOverlay" onclick="closeModal(event)">
+  <div class="modal" id="modal">
+    <div class="modal-top">
+      <h2>Donor Profile</h2>
+      <button class="modal-close" onclick="closeModalBtn()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+      </button>
+    </div>
+    <div class="modal-avatar" id="modalAvatar"></div>
+    <div class="modal-name" id="modalName"></div>
+    <div class="modal-blood" id="modalBlood"></div>
+    <div class="modal-details" id="modalDetails"></div>
+    <div class="modal-actions">
+      <button class="modal-call-btn" id="modalCallBtn">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.81a19.79 19.79 0 01-3.07-8.68A2 2 0 012 .82h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.09 8.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/>
+        </svg>
+        Call Donor
+      </button>
+      <button class="modal-msg-btn">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/>
+        </svg>
+        Message
+      </button>
+    </div>
+  </div>
+</div>
+
+<script src="script.js"></script>
+<script>
+  /* ── DONOR DATA ── */
+  const donors = [
+    { id:1,  name:'Amie Konteh',     initials:'AK', blood:'O+',  location:'Banjul',        phone:'+220 771 2345', available:true,  lastDonated:'3 months ago',  avatar:'default' },
+    { id:2,  name:'Lamin Jallow',    initials:'LJ', blood:'A+',  location:'Serrekunda',    phone:'+220 766 8821', available:true,  lastDonated:'6 months ago',  avatar:'alt1' },
+    { id:3,  name:'Fatou Bah',       initials:'FB', blood:'B+',  location:'Brikama',       phone:'+220 779 4412', available:true,  lastDonated:'2 months ago',  avatar:'alt2' },
+    { id:4,  name:'Modou Ceesay',    initials:'MC', blood:'AB+', location:'Kanifing',      phone:'+220 772 0034', available:false, lastDonated:'1 month ago',   avatar:'alt3' },
+    { id:5,  name:'Isatou Touray',   initials:'IT', blood:'O-',  location:'Banjul',        phone:'+220 780 5567', available:true,  lastDonated:'4 months ago',  avatar:'alt4' },
+    { id:6,  name:'Ebrima Sanneh',   initials:'ES', blood:'B-',  location:'Brikama',       phone:'+220 764 3318', available:true,  lastDonated:'5 months ago',  avatar:'default' },
+    { id:7,  name:'Mariama Drammeh', initials:'MD', blood:'A-',  location:'Serrekunda',    phone:'+220 776 9900', available:false, lastDonated:'2 weeks ago',   avatar:'alt1' },
+    { id:8,  name:'Ousman Baldeh',   initials:'OB', blood:'O+',  location:'Farafenni',     phone:'+220 752 6643', available:true,  lastDonated:'7 months ago',  avatar:'alt2' },
+    { id:9,  name:'Haddy Njie',      initials:'HN', blood:'AB-', location:'Banjul',        phone:'+220 781 1122', available:true,  lastDonated:'3 months ago',  avatar:'alt3' },
+    { id:10, name:'Yankuba Camara',  initials:'YC', blood:'A+',  location:'Kanifing',      phone:'+220 769 4477', available:true,  lastDonated:'4 months ago',  avatar:'alt4' },
+    { id:11, name:'Ndey Ceesay',     initials:'NC', blood:'B+',  location:'Brikama',       phone:'+220 773 8823', available:false, lastDonated:'1 month ago',   avatar:'default' },
+    { id:12, name:'Samba Jobe',      initials:'SJ', blood:'O-',  location:'Georgetown',    phone:'+220 755 3310', available:true,  lastDonated:'6 months ago',  avatar:'alt1' },
+  ];
+
+  let filtered = [...donors];
+
+  function renderDonors(list) {
+    const grid = document.getElementById('donorGrid');
+    const noResults = document.getElementById('noResults');
+    document.getElementById('resultCount').textContent = list.length;
+
+    if (list.length === 0) {
+      grid.innerHTML = '';
+      noResults.style.display = 'block';
+      return;
+    }
+    noResults.style.display = 'none';
+
+    grid.innerHTML = list.map(d => `
+      <div class="donor-card" onclick="openModal(${d.id})">
+        <div class="donor-card-top">
+          <div class="donor-card-avatar ${d.avatar}">${d.initials}</div>
+          <div class="blood-badge">${d.blood}</div>
+        </div>
+        <h3>${d.name}</h3>
+        <div class="donor-card-meta">
+          <div class="donor-meta-row">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/>
+            </svg>
+            ${d.location}, The Gambia
+          </div>
+          <div class="donor-meta-row">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+            </svg>
+            Last donated: ${d.lastDonated}
+          </div>
+        </div>
+        <div style="margin-bottom:16px;">
+          <span class="status-badge ${d.available ? 'status-available' : 'status-unavailable'}">
+            <span class="status-dot"></span>
+            ${d.available ? 'Available' : 'Unavailable'}
+          </span>
+        </div>
+        <button class="contact-btn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="16" height="16">
+            <path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.81a19.79 19.79 0 01-3.07-8.68A2 2 0 012 .82h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.09 8.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/>
+          </svg>
+          Contact Donor
+        </button>
+      </div>
+    `).join('');
+  }
+
+  function filterDonors() {
+    const name   = document.getElementById('searchName').value.toLowerCase();
+    const blood  = document.getElementById('filterBlood').value;
+    const status = document.getElementById('filterStatus').value;
+
+    filtered = donors.filter(d => {
+      const matchName   = !name   || d.name.toLowerCase().includes(name) || d.location.toLowerCase().includes(name);
+      const matchBlood  = !blood  || d.blood === blood;
+      const matchStatus = !status || (status === 'available' ? d.available : !d.available);
+      return matchName && matchBlood && matchStatus;
+    });
+    renderDonors(filtered);
+  }
+
+  function openModal(id) {
+    const d = donors.find(x => x.id === id);
+    if (!d) return;
+    document.getElementById('modalAvatar').textContent    = d.initials;
+    document.getElementById('modalAvatar').className      = `modal-avatar ${d.avatar}`;
+    document.getElementById('modalName').textContent      = d.name;
+    document.getElementById('modalBlood').innerHTML       = `<span class="blood-badge">${d.blood}</span>`;
+    document.getElementById('modalCallBtn').onclick       = () => window.location.href = `tel:${d.phone}`;
+    document.getElementById('modalDetails').innerHTML     = `
+      <div class="modal-detail-row">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.81a19.79 19.79 0 01-3.07-8.68A2 2 0 012 .82h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.09 8.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/>
+        </svg>
+        <div><strong>Phone Number</strong><span>${d.phone}</span></div>
+      </div>
+      <div class="modal-detail-row">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/>
+        </svg>
+        <div><strong>Location</strong><span>${d.location}, The Gambia</span></div>
+      </div>
+      <div class="modal-detail-row">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+        </svg>
+        <div><strong>Last Donated</strong><span>${d.lastDonated}</span></div>
+      </div>
+      <div class="modal-detail-row">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 2C12 2 5 10.5 5 15a7 7 0 0014 0C19 10.5 12 2 12 2z"/>
+        </svg>
+        <div><strong>Blood Group</strong><span>${d.blood}</span></div>
+      </div>
+    `;
+    document.getElementById('modalOverlay').classList.add('open');
+  }
+
+  function closeModal(e) {
+    if (e.target === document.getElementById('modalOverlay'))
+      document.getElementById('modalOverlay').classList.remove('open');
+  }
+  function closeModalBtn() {
+    document.getElementById('modalOverlay').classList.remove('open');
+  }
+
+  /* Search on Enter key */
+  document.getElementById('searchName').addEventListener('keyup', e => {
+    if (e.key === 'Enter') filterDonors();
+  });
+  document.getElementById('filterBlood').addEventListener('change', filterDonors);
+  document.getElementById('filterStatus').addEventListener('change', filterDonors);
+
+  /* Initial render */
+  renderDonors(donors);
+</script>
+</body>
+</html>
