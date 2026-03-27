@@ -10,7 +10,7 @@ const BARS = [
 
 const HIGHLIGHTS = [
   'BloodLink creates a centralised digital registry where voluntary donors can register and be found instantly by blood group and location.',
-  'The platform is fully accessible on mobile and desktop — reaching donors and patients wherever they are.',
+  'The platform is fully accessible on mobile and desktop, reaching donors and patients wherever they are.',
   'Built with modern web technologies, the system is fast, simple, and designed for people with varying levels of digital literacy.',
 ];
 
@@ -48,7 +48,7 @@ function AboutSection() {
             </div>
             <h4>Digital Solution</h4>
             <p>
-              BloodLink bridges the gap — a centralised platform connecting
+              BloodLink bridges the gap, a centralised platform connecting
               willing donors with those in need.
             </p>
           </div>
@@ -87,7 +87,7 @@ function AboutSection() {
           <p className="section-sub">
             Hospitals and patients in The Gambia often struggle to quickly locate
             blood donors during emergencies. Phone calls, personal networks, and
-            family outreach are slow — and in emergencies, every minute counts.
+            family outreach are slow. In emergencies, every minute counts.
           </p>
 
           <div className="about-highlights">

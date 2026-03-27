@@ -29,7 +29,7 @@ function HeroSection() {
 
         <p>
           BloodLink is a digital platform that helps people quickly find compatible
-          blood donors during emergencies across The Gambia — saving time, saving lives.
+          blood donors during emergencies across The Gambia, saving time and saving lives.
         </p>
 
         <div className="hero-btns">

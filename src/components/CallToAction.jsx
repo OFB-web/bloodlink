@@ -12,7 +12,7 @@ function CallToAction() {
         </h2>
 
         <p className="section-sub">
-          Whether you're looking for a donor or want to become one —
+          Whether you're looking for a donor or want to become one,
           BloodLink makes it simple, fast, and completely free.
         </p>
 

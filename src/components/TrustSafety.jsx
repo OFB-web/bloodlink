@@ -64,7 +64,7 @@ const IMPACT_ITEMS = [
 const TRUST_ITEMS = [
   {
     label: 'Verified Donor Profiles',
-    desc: 'Every donor completes an eligibility check before being listed — keeping the directory accurate and safe.',
+    desc: 'Every donor completes an eligibility check before being listed, keeping the directory accurate and safe.',
   },
   {
     label: 'Medical Awareness',
@@ -72,7 +72,7 @@ const TRUST_ITEMS = [
   },
   {
     label: 'Privacy First',
-    desc: 'Donor contact details are only visible to verified seekers — protecting privacy while enabling access.',
+    desc: 'Donor contact details are only visible to verified seekers, protecting privacy while enabling access.',
   },
 ];
 

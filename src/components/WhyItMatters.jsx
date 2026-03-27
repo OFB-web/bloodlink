@@ -27,7 +27,7 @@ const FEATURES = [
   },
   {
     title: 'Direct Donor Contact',
-    desc: 'Donor profiles show contact details so patients can reach out directly via call or WhatsApp — no middleman, no delays.',
+    desc: 'Donor profiles show contact details so patients can reach out directly via call or WhatsApp. No middleman, no waiting.',
     icon: (
       <svg className="feat-svg" viewBox="0 0 24 24" fill="none" strokeWidth="2"
         strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
@@ -49,7 +49,7 @@ const FEATURES = [
   },
   {
     title: 'Mobile-First Design',
-    desc: 'Fully optimised for smartphones, tablets, and desktops — accessible from any device, anywhere, any time.',
+    desc: 'Fully optimised for smartphones, tablets, and desktops. Accessible from any device, anywhere, any time.',
     icon: (
       <svg className="feat-svg" viewBox="0 0 24 24" fill="none" strokeWidth="2"
         strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
@@ -81,7 +81,7 @@ function WhyItMatters() {
           Everything You Need,<br /><span>Nothing You Don't</span>
         </h2>
         <p className="section-sub">
-          BloodLink is designed to be powerful yet simple — focused entirely on
+          BloodLink is designed to be powerful yet simple, focused entirely on
           connecting donors with patients as fast as possible.
         </p>
       </div>

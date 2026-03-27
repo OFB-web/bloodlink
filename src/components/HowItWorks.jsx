@@ -49,7 +49,7 @@ function HowItWorks() {
         <div className="section-label">How It Works</div>
         <h2 className="section-title">Three Simple <span>Steps</span></h2>
         <p className="section-sub">
-          BloodLink makes finding or registering as a blood donor straightforward and fast —
+          BloodLink makes finding or registering as a blood donor straightforward and fast,
           designed for anyone, anywhere in The Gambia.
         </p>
       </div>
