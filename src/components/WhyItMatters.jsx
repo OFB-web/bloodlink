@@ -1,4 +1,9 @@
-import React from 'react';
+import React, { useRef } from 'react';
+import gsap from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { useGSAP } from '@gsap/react';
+
+gsap.registerPlugin(ScrollTrigger, useGSAP);
 
 const FEATURES = [
   {
@@ -71,8 +76,107 @@ const FEATURES = [
 ];
 
 function WhyItMatters() {
+  const sectionRef = useRef(null);
+
+  useGSAP(
+    () => {
+      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+      const isMobile = window.innerWidth <= 600;
+
+      /* useGSAP scopes selector strings to sectionRef automatically */
+      const header = sectionRef.current.querySelector('.text-center');
+      const cards  = gsap.utils.toArray('.feat', sectionRef.current);
+
+      /* ── Section header entrance ── */
+      gsap.from(header, {
+        opacity: 0,
+        y: 30,
+        duration: 0.7,
+        ease: 'power2.out',
+        scrollTrigger: {
+          trigger: header,
+          start: 'top 86%',
+          toggleActions: 'play none none none',
+        },
+      });
+
+      if (isMobile) {
+        /* ── Mobile: staggered fade-up, no pin ── */
+        gsap.set(cards, { opacity: 0, y: 28, scale: 0.96 });
+        gsap.to(cards, {
+          opacity: 1,
+          y: 0,
+          scale: 1,
+          stagger: 0.12,
+          duration: 0.6,
+          ease: 'power2.out',
+          scrollTrigger: {
+            trigger: sectionRef.current.querySelector('.features-grid'),
+            start: 'top 88%',
+            toggleActions: 'play none none none',
+          },
+        });
+        return;
+      }
+
+      /* ── Desktop: pinned scroll timeline ── */
+      gsap.set(cards, {
+        opacity: 0,
+        x: (i) => i % 2 === 0 ? 90 : -90,
+        scale: 0.93,
+      });
+
+      const tl = gsap.timeline({
+        scrollTrigger: {
+          trigger: sectionRef.current,
+          start: 'top top',
+          end: `+=${cards.length * 320 + 300}`,
+          pin: true,
+          scrub: 1.5,
+          anticipatePin: 1,
+        },
+      });
+
+      cards.forEach((card, i) => {
+        /* Slide card in from its side + tint background */
+        tl.to(
+          card,
+          {
+            opacity: 1,
+            x: 0,
+            scale: 1,
+            backgroundColor: 'rgba(220,53,69,0.06)',
+            borderColor: 'rgba(220,53,69,0.24)',
+            boxShadow: '0 8px 32px rgba(220,53,69,0.14)',
+            duration: 0.55,
+            ease: 'power2.out',
+          },
+          i,
+        );
+
+        /* Dim the previously active card */
+        if (i > 0) {
+          tl.to(
+            cards[i - 1],
+            {
+              opacity: 0.42,
+              scale: 0.97,
+              backgroundColor: 'rgba(248,249,250,1)',
+              borderColor: 'rgba(233,236,239,1)',
+              boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
+              duration: 0.4,
+            },
+            i,
+          );
+        }
+      });
+    },
+    { scope: sectionRef },
+  );
+
   return (
-    <section className="features" id="features">
+    <section className="features" id="features" ref={sectionRef}>
 
       {/* Section header */}
       <div className="text-center">
@@ -89,7 +193,7 @@ function WhyItMatters() {
       {/* Feature cards grid */}
       <div className="features-grid" role="list">
         {FEATURES.map(({ title, desc, icon }) => (
-          <div className="feat reveal" key={title} role="listitem">
+          <div className="feat" key={title} role="listitem">
             <div className="feat-icon">{icon}</div>
             <div className="feat-body">
               <h4>{title}</h4>

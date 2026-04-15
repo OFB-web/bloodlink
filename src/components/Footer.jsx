@@ -17,10 +17,10 @@ function Footer() {
 
       <p>
         <strong>"Connecting Lives Through Blood Donation."</strong><br />
-        Final Year Project &mdash; BloodLink Blood Donor Finder System<br />
-        Developed by <strong>Joshua C. Achebe</strong> &middot; Student ID: 22316061<br />
+        BloodLink Blood Donor Finder System<br />
+        Developed by <strong>Joshua C. Achebe</strong> <br />
         Bachelor of Science in Computer Science &middot; University of The Gambia<br />
-        &copy; {new Date().getFullYear()} BloodLink. All rights reserved.
+        &copy; {new Date().getFullYear()} BloodLink. All rights reserved. ❤️
       </p>
     </footer>
   );

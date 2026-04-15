@@ -456,6 +456,8 @@ body {
 .features {
   background: var(--white);
   padding: 100px 5%;
+  min-height: 100vh;       /* fill the viewport when GSAP pins the section   */
+  overflow: hidden;        /* clip cards that are off-screen during slide-in  */
 }
 .features .text-center,
 .features-grid {
@@ -471,9 +473,11 @@ body {
   background: var(--bg); border-radius: var(--radius);
   padding: 24px; display: flex; align-items: flex-start; gap: 16px;
   border: 1px solid var(--border); box-shadow: var(--shadow-sm);
-  transition: box-shadow .2s, transform .2s;
+  /* No CSS transition here — GSAP owns opacity, transform, bg, border & shadow
+     during the scroll animation. Hover still works after the section unpins. */
+  will-change: transform, opacity;
 }
-.feat:hover { box-shadow: var(--shadow-md); transform: translateY(-3px); }
+.feat:hover { box-shadow: var(--shadow-md); }
 
 .feat-icon {
   width: 44px; height: 44px; border-radius: 12px; flex-shrink: 0;
