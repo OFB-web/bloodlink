@@ -1,18 +1,54 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
+import gsap from 'gsap';
+import { useGSAP } from '@gsap/react';
 
-const NAV_LINKS = [
-  { label: 'About',       href: '#about'    },
-  { label: 'How It Works',href: '#how'      },
-  { label: 'Features',    href: '#features' },
-  { label: 'Roles',       href: '#roles'    },
-  { label: 'Impact',      href: '#impact'   },
+/* ── Navigation card definitions ── */
+const NAV_CARDS = [
+  {
+    label: 'About',
+    bg: 'var(--bg)',
+    color: 'var(--text)',
+    links: [
+      { label: 'About BloodLink', href: '#about'  },
+      { label: 'How It Works',    href: '#how'    },
+    ],
+  },
+  {
+    label: 'Platform',
+    bg: 'var(--soft-red)',
+    color: 'var(--primary)',
+    links: [
+      { label: 'Features', href: '#features' },
+      { label: 'Roles',    href: '#roles'    },
+    ],
+  },
+  {
+    label: 'Impact',
+    bg: 'var(--primary)',
+    color: '#fff',
+    links: [
+      { label: 'Our Impact', href: '#impact' },
+    ],
+  },
 ];
 
-/* ── Drop (blood drop icon) ── */
+/* ── Arrow icon (replaces react-icons GoArrowUpRight) ── */
+function ArrowUpRight() {
+  return (
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none"
+      stroke="currentColor" strokeWidth="2.5"
+      strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <line x1="7" y1="17" x2="17" y2="7" />
+      <polyline points="7 7 17 7 17 17" />
+    </svg>
+  );
+}
+
+/* ── Blood-drop logo mark ── */
 function Drop() {
   return (
-    <div className="drop">
-      <svg viewBox="0 0 24 24" aria-hidden="true">
+    <div className="drop" aria-hidden="true">
+      <svg viewBox="0 0 24 24">
         <path d="M12 2C12 2 5 10.5 5 15a7 7 0 0014 0C19 10.5 12 2 12 2z" />
       </svg>
     </div>
@@ -20,27 +56,38 @@ function Drop() {
 }
 
 function Navbar() {
-  const [menuOpen,  setMenuOpen]  = useState(false);
-  const [scrolled,  setScrolled]  = useState(false);
-  const [navHidden, setNavHidden] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(false);
+  const [hidden,     setHidden]     = useState(false);
 
-  /* ── Scroll behaviour: hide on down, show on up ── */
+  const wrapperRef = useRef(null);
+  const navRef     = useRef(null);
+  const cardsRef   = useRef([]);
+  const tlRef      = useRef(null);
+
+  /* ── Hide nav on scroll-down, reveal on scroll-up ── */
   useEffect(() => {
-    let lastY = 0;
+    let lastY   = window.scrollY;
     let ticking = false;
 
     const onScroll = () => {
       if (ticking) return;
       requestAnimationFrame(() => {
         const y = window.scrollY;
-        setScrolled(y > 10);
         if (y > 80) {
-          setNavHidden(y > lastY);
-          if (y > lastY) setMenuOpen(false); // close menu on scroll-down
+          if (y > lastY) {
+            setHidden(true);
+            /* auto-close menu when hiding */
+            if (tlRef.current && tlRef.current.progress() > 0) {
+              tlRef.current.reverse();
+              setIsExpanded(false);
+            }
+          } else {
+            setHidden(false);
+          }
         } else {
-          setNavHidden(false);
+          setHidden(false);
         }
-        lastY = y;
+        lastY   = y;
         ticking = false;
       });
       ticking = true;
@@ -50,77 +97,147 @@ function Navbar() {
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
-  /* ── Lock body scroll when mobile menu is open ── */
+  /* ── Close on outside click ── */
   useEffect(() => {
-    document.body.style.overflow = menuOpen ? 'hidden' : '';
-    return () => { document.body.style.overflow = ''; };
-  }, [menuOpen]);
+    if (!isExpanded) return;
+    const handler = (e) => {
+      if (wrapperRef.current && !wrapperRef.current.contains(e.target)) {
+        reverseClose();
+      }
+    };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  // reverseClose is stable (useCallback), safe to omit from deps
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isExpanded]);
 
-  const closeMenu = useCallback(() => setMenuOpen(false), []);
+  /* ── GSAP timeline: collapse → expand ── */
+  useGSAP(() => {
+    const navEl = navRef.current;
+    const cards = cardsRef.current.filter(Boolean);
+    if (!navEl || !cards.length) return;
 
-  const navClass = [
-    'navbar',
-    scrolled  ? 'nav-scrolled' : '',
-    navHidden ? 'nav-hidden'   : '',
-  ].filter(Boolean).join(' ');
+    /* Start at 60 px (top-bar only), cards invisible below fold */
+    gsap.set(navEl, { height: 60, overflow: 'hidden' });
+    gsap.set(cards, { y: 50, opacity: 0 });
+
+    const tl = gsap.timeline({ paused: true });
+
+    /* 1. Expand the nav shell to its natural height */
+    tl.to(navEl, {
+      height: 'auto',
+      duration: 0.42,
+      ease: 'power3.out',
+    });
+
+    /* 2. Stagger cards up from below */
+    tl.to(cards, {
+      y: 0,
+      opacity: 1,
+      duration: 0.35,
+      ease: 'power3.out',
+      stagger: 0.08,
+    }, '-=0.18');
+
+    tlRef.current = tl;
+
+    return () => { tlRef.current = null; };
+  }, { scope: wrapperRef, dependencies: [] });
+
+  /* ── Helpers ── */
+  const reverseClose = useCallback(() => {
+    const tl = tlRef.current;
+    if (!tl || tl.progress() === 0) return;
+    tl.reverse();
+    tl.eventCallback('onReverseComplete', () => {
+      setIsExpanded(false);
+      tl.eventCallback('onReverseComplete', null);
+    });
+  }, []);
+
+  const toggleMenu = useCallback(() => {
+    const tl = tlRef.current;
+    if (!tl) return;
+    if (!isExpanded) {
+      setIsExpanded(true);
+      tl.play();
+    } else {
+      reverseClose();
+    }
+  }, [isExpanded, reverseClose]);
+
+  const handleLink = useCallback(() => {
+    reverseClose();
+  }, [reverseClose]);
 
   return (
-    <>
-      <nav className={navClass} id="navbar">
-        {/* Logo */}
-        <a href="#home" className="nav-logo" onClick={closeMenu}>
-          <Drop />
-          BloodLink
-        </a>
+    <div
+      ref={wrapperRef}
+      className={`card-nav-wrapper${hidden ? ' card-nav-wrapper--hidden' : ''}`}
+    >
+      <nav
+        ref={navRef}
+        className={`card-nav${isExpanded ? ' card-nav--open' : ''}`}
+        aria-label="Main navigation"
+      >
+        {/* ── Top bar ── */}
+        <div className="card-nav-top">
+          <a href="#home" className="nav-logo" onClick={handleLink}>
+            <Drop />
+            BloodLink
+          </a>
 
-        {/* Desktop links */}
-        <ul className="nav-links" role="list">
-          {NAV_LINKS.map(({ label, href }) => (
-            <li key={href}>
-              <a href={href}>{label}</a>
-            </li>
-          ))}
-        </ul>
+          {/* Desktop CTA */}
+          <a href="#roles" className="btn btn-primary card-nav-cta" onClick={handleLink}>
+            Get Started
+          </a>
 
-        {/* Desktop CTA */}
-        <div className="nav-cta">
-          <a href="#roles" className="btn btn-primary">Get Started</a>
+          {/* Hamburger — 2-bar style from the CardNav reference */}
+          <button
+            className={`card-nav-burger${isExpanded ? ' open' : ''}`}
+            onClick={toggleMenu}
+            aria-label={isExpanded ? 'Close menu' : 'Open menu'}
+            aria-expanded={isExpanded}
+            aria-controls="card-nav-content"
+          >
+            <span />
+            <span />
+          </button>
         </div>
 
-        {/* Hamburger (mobile) */}
-        <button
-          className={`hamburger${menuOpen ? ' open' : ''}`}
-          id="hamburger"
-          aria-label={menuOpen ? 'Close menu' : 'Open menu'}
-          aria-expanded={menuOpen}
-          onClick={() => setMenuOpen((o) => !o)}
+        {/* ── Expandable card content ── */}
+        <div
+          id="card-nav-content"
+          className="card-nav-content"
+          style={{ pointerEvents: isExpanded ? 'auto' : 'none' }}
+          aria-hidden={!isExpanded}
         >
-          <span />
-          <span />
-          <span />
-        </button>
-      </nav>
-
-      {/* Mobile drawer */}
-      <div className={`mobile-menu${menuOpen ? ' open' : ''}`} aria-hidden={!menuOpen}>
-        {/* Backdrop */}
-        <div className="mobile-menu-overlay" onClick={closeMenu} />
-
-        {/* Slide-in panel */}
-        <div className="mobile-menu-panel" role="dialog" aria-modal="true" aria-label="Navigation menu">
-          <ul className="mobile-nav-links" role="list">
-            {NAV_LINKS.map(({ label, href }) => (
-              <li key={href}>
-                <a href={href} className="mobile-link" onClick={closeMenu}>{label}</a>
-              </li>
-            ))}
-          </ul>
-          <div className="mobile-nav-cta">
-            <a href="#roles" className="btn btn-primary btn-full" onClick={closeMenu}>Get Started</a>
-          </div>
+          {NAV_CARDS.map((card, i) => (
+            <div
+              key={card.label}
+              className="nav-card"
+              ref={(el) => { cardsRef.current[i] = el; }}
+              style={{ backgroundColor: card.bg, color: card.color }}
+            >
+              <div className="nav-card-label">{card.label}</div>
+              <div className="nav-card-links">
+                {card.links.map((lnk) => (
+                  <a
+                    key={lnk.href}
+                    href={lnk.href}
+                    className="nav-card-link"
+                    onClick={handleLink}
+                  >
+                    <ArrowUpRight />
+                    {lnk.label}
+                  </a>
+                ))}
+              </div>
+            </div>
+          ))}
         </div>
-      </div>
-    </>
+      </nav>
+    </div>
   );
 }
 
