@@ -33,24 +33,24 @@ function HeroSection() {
         </p>
 
         <div className="hero-btns">
-          <a href="find-donor.html" className="btn btn-primary btn-lg">
-            {/* Search icon */}
+          <a href="#how" className="btn btn-primary btn-lg">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
               stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"
               aria-hidden="true">
-              <circle cx="11" cy="11" r="8" />
-              <line x1="21" y1="21" x2="16.65" y2="16.65" />
+              <circle cx="12" cy="12" r="10" />
+              <polyline points="12 8 12 12 14 14" />
             </svg>
-            Find a Donor
+            See How It Works
           </a>
-          <a href="become-donor.html" className="btn btn-outline btn-lg">
-            {/* Drop icon */}
+          <a href="#roles" className="btn btn-outline btn-lg">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
               stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"
               aria-hidden="true">
-              <path d="M12 2C12 2 5 10.5 5 15a7 7 0 0014 0C19 10.5 12 2 12 2z" />
+              <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" />
+              <circle cx="9" cy="7" r="4" />
+              <path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75" />
             </svg>
-            Become a Donor
+            Explore Roles
           </a>
         </div>
 

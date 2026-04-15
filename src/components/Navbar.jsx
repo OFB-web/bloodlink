@@ -4,6 +4,7 @@ const NAV_LINKS = [
   { label: 'About',       href: '#about'    },
   { label: 'How It Works',href: '#how'      },
   { label: 'Features',    href: '#features' },
+  { label: 'Roles',       href: '#roles'    },
   { label: 'Impact',      href: '#impact'   },
 ];
 
@@ -83,8 +84,7 @@ function Navbar() {
 
         {/* Desktop CTA */}
         <div className="nav-cta">
-          <a href="find-donor.html"   className="btn btn-outline">Find Donor</a>
-          <a href="become-donor.html" className="btn btn-primary">Become a Donor</a>
+          <a href="#roles" className="btn btn-primary">Get Started</a>
         </div>
 
         {/* Hamburger (mobile) */}
@@ -116,8 +116,7 @@ function Navbar() {
             ))}
           </ul>
           <div className="mobile-nav-cta">
-            <a href="find-donor.html"   className="btn btn-outline btn-full" onClick={closeMenu}>Find Donor</a>
-            <a href="become-donor.html" className="btn btn-primary btn-full" onClick={closeMenu}>Become a Donor</a>
+            <a href="#roles" className="btn btn-primary btn-full" onClick={closeMenu}>Get Started</a>
           </div>
         </div>
       </div>

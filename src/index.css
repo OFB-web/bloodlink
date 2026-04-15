@@ -570,6 +570,75 @@ body {
 .cta-inner .section-sub   { margin: 0 auto 36px; }
 .cta-btns { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; }
 
+/* ── Roles grid (inside .cta-section) ── */
+.roles-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  margin-top: 48px;
+  max-width: 780px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.role-card {
+  background: var(--white);
+  border-radius: var(--radius);
+  padding: 36px 28px;
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 14px;
+  text-align: left;
+}
+
+.role-icon {
+  width: 52px; height: 52px;
+  border-radius: 14px;
+  background: var(--soft-red);
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.role-icon svg       { width: 24px; height: 24px; stroke: var(--primary); }
+.role-icon--donor    { background: var(--primary-light); }
+
+.role-card h3 {
+  font-family: var(--font-head);
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text);
+  margin: 0;
+}
+
+.role-card p {
+  font-size: .87rem;
+  color: var(--text-muted);
+  line-height: 1.7;
+  margin: 0;
+  flex: 1;
+}
+
+.role-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: .75rem;
+  font-weight: 600;
+  color: var(--primary);
+  background: var(--soft-red);
+  padding: 5px 12px;
+  border-radius: 20px;
+  margin-top: 4px;
+}
+.role-badge svg { stroke: var(--primary); flex-shrink: 0; }
+
+@media (max-width: 600px) {
+  .roles-grid { grid-template-columns: 1fr; }
+  .role-card  { padding: 28px 20px; }
+}
+
 /* ════════════════════════════════════════
    FOOTER
 ════════════════════════════════════════ */
